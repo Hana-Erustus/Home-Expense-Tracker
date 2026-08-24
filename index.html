@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Household Expense Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display+SC:wght@400;700&family=Alex+Brush&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --indigo: #7281d9;
+    --indigo-dark: #5563b8;
+    --indigo-tint: #E4E7FA;
+    --olive: #5e784c;
+    --olive-dark: #4a5f3c;
+    --olive-tint: #E2EADB;
+    --coral: #E0637A;
+    --gold: #E3A83C;
+    --teal: #3FA192;
+    --plum: #9B6FC9;
+    --rose: #E37FAE;
+    --slate: #6C7A94;
+    --bg: #FAFAFC;
+    --card: #FFFFFF;
+    --ink: #2B2A3A;
+    --ink-soft: #6B6A80;
+    --line: #DEDDEE;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Poppins', -apple-system, sans-serif;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  body.pantry-bg { background: var(--olive-tint); }
+  .masthead {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 1.1rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .masthead h1 {
+    font-family: 'Playfair Display SC', serif;
+    font-weight: 700;
+    font-size: 1.9rem;
+    margin: 0;
+    color: var(--indigo-dark);
+  }
+  .masthead h1.olive { color: var(--olive-dark); }
+  .masthead .sub {
+    font-family: 'Alex Brush', cursive;
+    font-size: 1.6rem;
+    color: var(--olive);
+    margin-top: 0.1rem;
+  }
+  .header-btns { display: flex; gap: 0.6rem; align-items: center; }
+  .add-btn {
+    background: var(--indigo);
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.4rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    border-radius: 999px;
+  }
+  .add-btn:hover { background: var(--indigo-dark); }
+  .add-btn.green { background: var(--olive); }
+  .add-btn.green:hover { background: var(--olive-dark); }
+  .back-btn {
+    background: none;
+    border: 1.5px solid var(--olive-dark);
+    color: var(--olive-dark);
+    padding: 0.7rem 1.2rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 0.78rem;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .back-btn:hover { background: var(--olive-dark); color: #fff; }
+
+  .summary-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.9rem;
+    margin: 1.5rem 0 0.9rem;
+  }
+  .summary-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 1rem 1.15rem;
+    box-shadow: 0 2px 10px rgba(114,129,217,0.06);
+  }
+  .summary-card .label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--ink-soft);
+    margin: 0 0 0.35rem;
+    font-weight: 600;
+  }
+  .summary-card .value {
+    font-family: 'Playfair Display SC', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--indigo-dark);
+  }
+  .bulk-summary-card {
+    background: var(--olive-tint);
+    border-radius: 18px;
+    padding: 1rem 1.15rem;
+    margin-bottom: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .bulk-summary-card .label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--olive-dark);
+    font-weight: 600;
+    margin: 0 0 0.2rem;
+  }
+  .bulk-summary-card .note {
+    font-size: 0.72rem;
+    color: var(--olive-dark);
+    opacity: 0.8;
+    margin: 0;
+  }
+  .bulk-summary-card .value {
+    font-family: 'Playfair Display SC', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--olive-dark);
+  }
+  .bulk-view-btn {
+    background: var(--olive);
+    color: #fff;
+    border: none;
+    padding: 0.7rem 1.3rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .bulk-view-btn:hover { background: var(--olive-dark); }
+
+  .filter-row {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    margin: 0.5rem 0 0.5rem;
+    flex-wrap: wrap;
+  }
+  .filter-row select {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: 1px solid var(--line);
+    padding: 0.55rem 2.4rem 0.55rem 1rem;
+    border-radius: 999px;
+    background-color: var(--card);
+    color: var(--ink);
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%236B6A80' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+  }
+
+  .breakdown { margin-top: 1.9rem; }
+  .breakdown h4 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin: 0 0 0.7rem;
+  }
+  .bd-row { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.5rem; cursor: pointer; padding: 0.15rem; border-radius: 8px; }
+  .bd-row:hover { background: var(--indigo-tint); }
+  .bd-label { width: 150px; flex-shrink: 0; font-size: 0.78rem; font-weight: 600; }
+  .bd-track { flex: 1; height: 14px; background: var(--indigo-tint); border-radius: 999px; overflow: hidden; }
+  .bd-fill { height: 100%; border-radius: 999px; }
+  .bd-amt { width: 80px; text-align: right; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 0.75rem; }
+
+  .ledger { margin-top: 2rem; }
+  .month-group { margin-bottom: 1.6rem; }
+  .month-title {
+    font-family: 'Playfair Display SC', serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin: 0 0 0.7rem;
+    color: var(--indigo-dark);
+  }
+  .expense-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 0.85rem 1.1rem;
+    margin-bottom: 0.6rem;
+    display: grid;
+    grid-template-columns: 78px 1fr auto auto;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .e-date { font-family: 'Poppins', sans-serif; font-size: 0.7rem; font-weight: 600; color: var(--ink-soft); }
+  .e-vendor { font-weight: 600; font-size: 0.9rem; }
+  .e-note { font-size: 0.75rem; color: var(--ink-soft); margin-top: 0.1rem; }
+  .cat-badge {
+    display: inline-block;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    color: #fff;
+    white-space: nowrap;
+  }
+  .e-right { display: flex; align-items: center; gap: 0.6rem; }
+  .e-amt { font-family: 'Playfair Display SC', serif; font-weight: 700; font-size: 1rem; color: var(--indigo-dark); }
+  .view-btn {
+    background: var(--indigo-tint);
+    color: var(--indigo-dark);
+    border: none;
+    padding: 0.4rem 0.75rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .view-btn:hover { background: var(--indigo); color: #fff; }
+  .view-btn.olive { background: var(--olive-tint); color: var(--olive-dark); }
+  .view-btn.olive:hover { background: var(--olive); color: #fff; }
+  .e-del {
+    background: none; border: none; color: var(--ink-soft);
+    cursor: pointer; font-size: 1.1rem; line-height: 1; padding: 0 0.2rem;
+  }
+  .e-del:hover { color: var(--coral); }
+
+  .empty-state { text-align: center; padding: 3.5rem 1rem; color: var(--ink-soft); }
+  .empty-state p { font-size: 0.95rem; max-width: 380px; margin: 0.4rem auto 0; line-height: 1.5; }
+
+  .pantry-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 1.1rem;
+    margin-top: 1.5rem;
+  }
+  .pantry-item-card {
+    background: var(--card);
+    border: 1px solid var(--olive);
+    border-radius: 16px;
+    padding: 1rem 1.15rem;
+    cursor: pointer;
+  }
+  .pantry-item-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.8rem; }
+  .pantry-item-name { font-family: 'Playfair Display SC', serif; font-weight: 700; font-size: 1.05rem; margin: 0 0 0.25rem; color: var(--olive-dark); }
+  .pantry-item-vendor { font-size: 0.68rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em; }
+  .pantry-gauge-wrap { width: 44px; flex-shrink: 0; }
+  .pantry-gauge-track {
+    width: 22px; height: 46px;
+    border: 1.5px solid var(--olive-dark);
+    border-radius: 3px 3px 5px 5px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    background: var(--olive-tint);
+  }
+  .pantry-gauge-fill { position: absolute; bottom: 0; left: 0; right: 0; }
+  .pantry-gauge-label { text-align: center; font-size: 0.62rem; color: var(--ink-soft); margin-top: 0.25rem; font-family: 'Poppins', sans-serif; }
+  .pantry-status-row { display: flex; align-items: center; gap: 0.4rem; margin-top: 0.7rem; font-size: 0.78rem; font-weight: 600; }
+  .pantry-status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .pantry-meta-line { font-size: 0.75rem; color: var(--ink-soft); margin-top: 0.35rem; }
+  .pantry-detail { margin-top: 0.9rem; padding-top: 0.9rem; border-top: 1px dashed var(--line); }
+  .pantry-detail h5 {
+    font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--ink-soft); font-family: 'Poppins', sans-serif; font-weight: 600; margin: 0 0 0.6rem;
+  }
+  .pantry-history-row {
+    display: flex; flex-direction: column; gap: 0.3rem;
+    font-size: 0.74rem; padding: 0.4rem 0; border-bottom: 1px solid var(--olive-tint);
+  }
+  .pantry-history-row:last-child { border-bottom: none; }
+  .pantry-history-top { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+  .pantry-history-status { color: var(--ink-soft); }
+  .pantry-history-started { color: var(--gold); font-weight: 600; }
+  .pantry-history-open { color: var(--olive-dark); font-weight: 700; }
+  .row-actions { display: flex; align-items: center; gap: 0.4rem; }
+  .row-mini-btn {
+    background: none; border: 1px solid var(--gold); color: var(--gold);
+    padding: 0.25rem 0.55rem; font-size: 0.6rem; font-family: 'Poppins', sans-serif;
+    font-weight: 600; border-radius: 999px; cursor: pointer; white-space: nowrap;
+  }
+  .row-mini-btn:hover { background: var(--gold); color: #fff; }
+  .row-start-form { display: none; gap: 0.4rem; margin-top: 0.2rem; }
+  .row-start-form.active { display: flex; }
+  .row-start-form input {
+    font-family: 'Poppins', sans-serif; font-size: 0.7rem; border: 1px solid var(--line);
+    padding: 0.3rem 0.4rem; border-radius: 8px; background: var(--bg); flex: 1;
+  }
+  .row-start-form button {
+    background: var(--gold); color: #fff; border: none; padding: 0.3rem 0.6rem;
+    font-size: 0.65rem; font-weight: 600; border-radius: 999px; cursor: pointer;
+  }
+  .pantry-detail-actions { display: flex; gap: 0.5rem; margin-top: 0.8rem; flex-wrap: wrap; }
+  .pantry-mini-btn {
+    background: none; border: 1px solid var(--olive-dark); color: var(--olive-dark);
+    padding: 0.42rem 0.7rem; font-size: 0.7rem; font-family: 'Poppins', sans-serif;
+    font-weight: 600; border-radius: 999px; cursor: pointer;
+  }
+  .pantry-mini-btn:hover { background: var(--olive-dark); color: #fff; }
+  .pantry-inline-form { margin-top: 0.7rem; display: none; gap: 0.5rem; flex-wrap: wrap; }
+  .pantry-inline-form.active { display: flex; }
+  .pantry-inline-form input {
+    font-family: 'Poppins', sans-serif; font-size: 0.75rem; border: 1px solid var(--line);
+    padding: 0.4rem 0.55rem; border-radius: 8px; background: var(--bg); flex: 1; min-width: 80px;
+  }
+  .pantry-inline-form button {
+    background: var(--olive); color: #fff; border: none; padding: 0.4rem 0.75rem;
+    font-size: 0.7rem; font-weight: 600; border-radius: 999px; cursor: pointer;
+  }
+
+  .overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(43,42,58,0.4);
+    align-items: center; justify-content: center;
+    z-index: 10; padding: 1rem;
+  }
+  .overlay.active { display: flex; }
+  .panel {
+    background: var(--card);
+    border-radius: 22px;
+    padding: 1.6rem;
+    width: 100%; max-width: 420px;
+    max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(43,42,58,0.25);
+  }
+  .panel h3 {
+    font-family: 'Playfair Display SC', serif;
+    font-weight: 700;
+    margin: 0 0 1.1rem;
+    font-size: 1.3rem;
+    color: var(--indigo-dark);
+  }
+  .panel h3.olive { color: var(--olive-dark); }
+  .field { margin-bottom: 0.85rem; }
+  .field label {
+    display: block; font-size: 0.68rem; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--ink-soft); font-weight: 600; margin-bottom: 0.3rem;
+  }
+  .field input, .field select, .field textarea {
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.82rem;
+    border: 1px solid var(--line);
+    padding: 0.6rem 0.75rem;
+    border-radius: 12px;
+    background: var(--bg);
+    color: var(--ink);
+  }
+  .field select { padding-right: 2.4rem; background-position: right 16px center; }
+  .field textarea { resize: vertical; min-height: 50px; }
+  .field-row { display: flex; gap: 0.7rem; }
+  .field-row .field { flex: 1; }
+  .panel-actions { display: flex; justify-content: flex-end; gap: 0.6rem; margin-top: 1.1rem; }
+  .mini-btn {
+    background: none;
+    border: 1.5px solid var(--indigo);
+    color: var(--indigo-dark);
+    padding: 0.55rem 1rem;
+    font-size: 0.75rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .mini-btn:hover { background: var(--indigo); color: #fff; }
+  .mini-btn.primary { background: var(--indigo); color: #fff; }
+  .mini-btn.primary:hover { background: var(--indigo-dark); }
+  .mini-btn.olive { border-color: var(--olive-dark); color: var(--olive-dark); }
+  .mini-btn.olive:hover { background: var(--olive-dark); color: #fff; }
+  .mini-btn.olive.primary { background: var(--olive); color: #fff; border-color: var(--olive); }
+  .mini-btn.olive.primary:hover { background: var(--olive-dark); }
+  .err { color: var(--coral); font-size: 0.72rem; margin-top: 0.3rem; display: none; }
+
+  .receipt-panel {
+    background: var(--card);
+    border-radius: 22px;
+    padding: 1.4rem;
+    width: 100%; max-width: 400px;
+    max-height: 92vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(43,42,58,0.25);
+    text-align: center;
+  }
+  .receipt-panel img { width: 100%; border-radius: 14px; display: block; margin-bottom: 1rem; }
+  .receipt-panel .rp-title { font-family: 'Playfair Display SC', serif; font-weight: 700; font-size: 1.1rem; color: var(--indigo-dark); margin: 0 0 0.2rem; }
+  .receipt-panel .rp-date { font-size: 0.72rem; color: var(--ink-soft); margin-bottom: 0.8rem; }
+  .receipt-panel .rp-divider { border-top: 1.5px dashed var(--line); margin: 0.8rem 0; }
+  .receipt-panel .rp-row { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 0.25rem 0; text-align: left; }
+  .receipt-panel .rp-total { font-family: 'Playfair Display SC', serif; font-weight: 700; font-size: 1.25rem; color: var(--indigo-dark); margin-top: 0.5rem; }
+  .receipt-panel .rp-note { font-size: 0.78rem; color: var(--ink-soft); margin-top: 0.7rem; line-height: 1.5; }
+  .receipt-panel .mini-btn { margin-top: 1.2rem; }
+</style>
+</head>
+<body>
+
+<div class="wrap" id="budgetView">
+  <div class="masthead">
+    <div>
+      <h1>Household Expense Tracker</h1>
+      <div class="sub">every receipt, gathered</div>
+    </div>
+    <button class="add-btn" id="openAdd">+ Add Expense</button>
+  </div>
+
+  <div id="summaryHost"></div>
+  <div id="bulkSummaryHost"></div>
+  <div class="filter-row">
+    <select id="monthFilter"></select>
+    <select id="catFilter"></select>
+  </div>
+  <div id="breakdownHost"></div>
+  <div id="ledgerHost"></div>
+</div>
+
+<div class="wrap" id="pantryView" style="display:none;">
+  <div class="masthead">
+    <div>
+      <h1 class="olive">Pantry Stock Tracker</h1>
+      <div class="sub">bulk orders &middot; usage rate &middot; reorder timing</div>
+    </div>
+    <div class="header-btns">
+      <button class="back-btn" id="backToBudget">&larr; Back to expenses</button>
+      <button class="add-btn green" id="openPantryAdd">+ Add Pantry Item</button>
+    </div>
+  </div>
+  <div id="pantryGridHost"></div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="panel">
+    <h3>Add an Expense</h3>
+    <div class="field">
+      <label for="f-vendor">Vendor / place</label>
+      <input id="f-vendor" placeholder="e.g. Krist Food Mart">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label for="f-date">Date</label>
+        <input id="f-date" type="date">
+      </div>
+      <div class="field">
+        <label for="f-amount">Amount</label>
+        <input id="f-amount" type="number" min="0" step="0.01" placeholder="45.00">
+      </div>
+    </div>
+    <div class="field">
+      <label for="f-category">Category</label>
+      <select id="f-category">
+        <option>Groceries</option>
+        <option>Fuel</option>
+        <option>Auto &amp; Vehicle</option>
+        <option>Household &amp; Equipment</option>
+        <option>Shopping</option>
+        <option>Gifts</option>
+        <option>Education</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="f-note">Note (optional)</label>
+      <textarea id="f-note" placeholder="What was this for?"></textarea>
+    </div>
+    <div class="err" id="f-err">Enter a vendor and an amount first.</div>
+    <div class="panel-actions">
+      <button class="mini-btn" id="cancelAdd">Cancel</button>
+      <button class="mini-btn primary" id="saveAdd">Save Expense</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="pantryOverlay">
+  <div class="panel">
+    <h3 class="olive">Add a Pantry Item</h3>
+    <div class="field">
+      <label for="p-name">Item name</label>
+      <input id="p-name" placeholder="e.g. Hard red wheat berries">
+    </div>
+    <div class="field">
+      <label for="p-vendor">Vendor</label>
+      <select id="p-vendor">
+        <option>Walmart</option>
+        <option>Azure Standard</option>
+        <option>Grand Teton Ancient Grains</option>
+        <option>Belle Valley Ancient Grains</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label for="p-qty">Quantity</label>
+        <input id="p-qty" type="number" min="0" step="0.1" placeholder="25">
+      </div>
+      <div class="field">
+        <label for="p-unit">Unit</label>
+        <input id="p-unit" placeholder="lb, bag, gal">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label for="p-date">Purchase date</label>
+        <input id="p-date" type="date">
+      </div>
+      <div class="field">
+        <label for="p-cost">Cost (optional)</label>
+        <input id="p-cost" type="number" min="0" step="0.01" placeholder="42.00">
+      </div>
+    </div>
+    <div class="err" id="p-err">Enter an item name, quantity, and unit first.</div>
+    <div class="panel-actions">
+      <button class="mini-btn olive" id="cancelPantryAdd">Cancel</button>
+      <button class="mini-btn olive primary" id="savePantryAdd">Save Item</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="receiptOverlay">
+  <div class="receipt-panel" id="receiptContent"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* PUBLIC CONFIG ONLY. The anon/publishable key is safe here only with the supplied RLS policies.
+   Never put a service_role key, a password, or a PIN in this file. */
+window.SUPABASE_CONFIG = {
+  url: 'https://supabase.com/dashboard/project/bupiiuimbhfekbxngedy',
+  anonKey: 'sb_publishable_EeReZHby-OwqZfLZtmW36w_xvTkzhy6'
+};
+
+let sb, user, expenses = [], expenseView = 'active', pantryView = 'active', expandedPantryItem = null;
+const CACHE_KEY = 'household-tracker-public-shell-v1';
+const q = id => document.getElementById(id);
+const uid = () => crypto.randomUUID();
+const todayStr = () => new Date().toISOString().slice(0, 10);
+const esc = v => String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+const money = n => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(n || 0));
+const date = v => v ? new Date(v + 'T12:00:00').toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}) : '—';
+const monthKey = v => (v || '').slice(0,7);
+const monthLabel = v => new Date(v + '-01T12:00:00').toLocaleDateString(undefined,{month:'long',year:'numeric'});
+const daysBetween = (a,b) => Math.round((new Date(b+'T12:00:00') - new Date(a+'T12:00:00')) / 86400000);
+const CAT_COLORS = {Groceries:'var(--olive)',Fuel:'var(--coral)','Auto & Vehicle':'var(--gold)','Household & Equipment':'var(--indigo)',Shopping:'var(--slate)',Gifts:'var(--coral)',Education:'var(--gold)',Other:'var(--slate)','Bulk Pantry Orders':'var(--olive)'};
+
+function addControls() {
+  q('budgetView').querySelector('.masthead').insertAdjacentHTML('beforeend', '<div class="header-btns"><button class="back-btn" id="expenseCsv">Download CSV</button><button class="back-btn" id="signOut">Lock</button></div>');
+  q('pantryView').querySelector('.masthead').insertAdjacentHTML('afterend', '<div class="filter-row" id="pantryControls"><button class="back-btn" data-pview="active">Active</button><button class="back-btn" data-pview="archived">Archived</button><button class="back-btn" data-pview="all">All</button><button class="back-btn" id="pantryCsv">Download CSV</button></div>');
+  q('budgetView').querySelector('.filter-row').insertAdjacentHTML('afterend', '<div class="filter-row" id="expenseControls"><button class="back-btn" data-eview="active">Active</button><button class="back-btn" data-eview="archived">Archived</button><button class="back-btn" data-eview="all">All</button></div>');
+  q('f-note').parentElement.insertAdjacentHTML('afterend', '<div class="field"><label for="f-receipt">Receipt photo (optional)</label><input id="f-receipt" type="file" accept="image/*"></div>');
+  q('p-cost').closest('.field-row').insertAdjacentHTML('afterend', '<div class="field"><label for="p-link">Buy-more link (optional)</label><input id="p-link" type="url" placeholder="https://..."></div>');
+  document.body.insertAdjacentHTML('beforeend', '<div class="overlay active" id="authOverlay"><div class="panel"><h3>Unlock your tracker data</h3><p class="note">Sign in to your Supabase account to log in.</p><div class="field"><label for="authEmail">Email:</label><input id="authEmail" type="email" autocomplete="username"></div><div class="field"><label for="authPassword">Password</label><input id="authPassword" type="password" autocomplete="current-password"></div><div class="err" id="authErr"></div><div class="panel-actions" style="justify-content:flex-start;"><button class="mini-btn primary" id="authSubmit">Unlock</button></div></div></div>');
+  document.querySelectorAll('[data-eview]').forEach(b => b.onclick = () => { expenseView = b.dataset.eview; render(); });
+  document.querySelectorAll('[data-pview]').forEach(b => b.onclick = () => { pantryView = b.dataset.pview; renderPantryView(); });
+  q('expenseCsv').onclick = () => downloadCsv(recordsFor(expenseView, false), 'expenses-' + expenseView + '.csv');
+  q('pantryCsv').onclick = () => downloadCsv(recordsFor(pantryView, true), 'pantry-purchases-' + pantryView + '.csv');
+  q('signOut').onclick = async () => { await sb.auth.signOut(); location.reload(); };
+  q('authSubmit').onclick = signIn;
+  q('authPassword').addEventListener('keydown', e => { if (e.key === 'Enter') signIn(); });
+}
+
+function configured() { return !sb && window.SUPABASE_CONFIG.url.startsWith('http') && !window.SUPABASE_CONFIG.anonKey.startsWith('YOUR_'); }
+async function signIn() {
+  if (!sb) return showAuthError('Setup is not complete. Add your Supabase URL and anon/publishable key first.');
+  const email = q('authEmail').value.trim(), password = q('authPassword').value;
+  q('authErr').style.display = 'none';
+  if (!email || !password) return showAuthError('Enter your shared email and password.');
+  const { error } = await sb.auth.signInWithPassword({email,password});
+  if (error) return showAuthError('Could not unlock the tracker. Check the email and password.');
+}
+function showAuthError(message) { q('authErr').textContent = message; q('authErr').style.display = 'block'; }
+async function boot() {
+  addControls();
+  if (!configured()) return showAuthError('Setup is not complete. Add your Supabase URL and anon/publishable key to SUPABASE_CONFIG.');
+  sb = window.supabase.createClient(window.SUPABASE_CONFIG.url, window.SUPABASE_CONFIG.anonKey, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+  sb.auth.onAuthStateChange((_event, session) => { if (session?.user) start(session.user); });
+  const {data:{session}} = await sb.auth.getSession();
+  if (session?.user) await start(session.user);
+}
+let started = false;
+async function start(currentUser) {
+  if (started) return; started = true; user = currentUser; q('authOverlay').classList.remove('active');
+  const {data,error} = await sb.from('tracker_records').select('*').order('entry_date',{ascending:false});
+  if (error) { started = false; q('authOverlay').classList.add('active'); return showAuthError('Database setup is incomplete: ' + error.message); }
+  expenses = data.map(fromRow); render();
+  sb.channel('tracker-records').on('postgres_changes',{event:'*',schema:'public',table:'tracker_records',filter:'owner_id=eq.'+user.id}, async () => {
+    const r = await sb.from('tracker_records').select('*').order('entry_date',{ascending:false}); if (!r.error) { expenses = r.data.map(fromRow); render(); if (q('pantryView').style.display !== 'none') renderPantryView(); }
+  }).subscribe();
+}
+function fromRow(r) { return {...r.payload,id:r.id,date:r.entry_date,amount:Number(r.amount),category:r.category,archived:r.archived,receiptPath:r.receipt_path}; }
+function toRow(e) { const {id,date,amount,category,archived,receiptPath,...payload} = e; return {id,owner_id:user.id,entry_date:date,amount:Number(amount||0),category,archived:!!archived,receipt_path:receiptPath||null,payload}; }
+async function save(e) { const {error} = await sb.from('tracker_records').upsert(toRow(e)); if (error) alert('Could not save: '+error.message); }
+async function remove(id) { if (!confirm('Delete this entry permanently?')) return; const e=expenses.find(x=>x.id===id); if(e?.receiptPath) await sb.storage.from('receipt-photos').remove([e.receiptPath]); const {error}=await sb.from('tracker_records').delete().eq('id',id); if(error) alert(error.message); }
+async function archive(id, archived) { const e=expenses.find(x=>x.id===id); if(!e)return; e.archived=archived; await save(e); render(); if(q('pantryView').style.display!=='none')renderPantryView(); }
+async function uploadReceipt(file, recordId) { if (!file) return null; if (!file.type.startsWith('image/') || file.size > 8*1024*1024) throw new Error('Choose an image under 8 MB.'); const ext=(file.name.split('.').pop()||'jpg').replace(/[^a-z0-9]/gi,''); const p=user.id+'/'+recordId+'/'+crypto.randomUUID()+'.'+ext; const {error}=await sb.storage.from('receipt-photos').upload(p,file,{contentType:file.type,upsert:false}); if(error)throw error; return p; }
+function recordsFor(view, pantry) { return expenses.filter(e => (e.category==='Bulk Pantry Orders')===pantry && (view==='all'||!!e.archived===(view==='archived'))); }
+function render() { populateFilters(); const m=q('monthFilter').value||'all', c=q('catFilter').value||'all'; const list=recordsFor(expenseView,false).filter(e=>(m==='all'||monthKey(e.date)===m)&&(c==='all'||e.category===c)); renderSummary(list); renderBreakdown(list); renderLedger(list); }
+function populateFilters() { const oldM=q('monthFilter').value||'all',oldC=q('catFilter').value||'all'; const list=recordsFor(expenseView,false); const months=[...new Set(list.map(e=>monthKey(e.date)))].sort().reverse(); const cats=[...new Set(list.map(e=>e.category))].sort(); q('monthFilter').innerHTML='<option value="all">All months</option>'+months.map(m=>'<option value="'+m+'">'+monthLabel(m)+'</option>').join(''); q('catFilter').innerHTML='<option value="all">All categories</option>'+cats.map(c=>'<option>'+esc(c)+'</option>').join(''); q('monthFilter').value=months.includes(oldM)?oldM:'all';q('catFilter').value=cats.includes(oldC)?oldC:'all';q('monthFilter').onchange=render;q('catFilter').onchange=render; }
+function renderSummary(list) { const total=list.reduce((s,e)=>s+Number(e.amount),0), avg=list.length?total/list.length:0; q('summaryHost').innerHTML='<div class="summary-grid"><div class="summary-card"><p class="label">Total spent</p><p class="value">'+money(total)+'</p></div><div class="summary-card"><p class="label">Receipts</p><p class="value">'+list.length+'</p></div><div class="summary-card"><p class="label">Avg. receipt</p><p class="value">'+money(avg)+'</p></div></div>'; }
+function renderBreakdown(list) { const by={};list.forEach(e=>by[e.category]=(by[e.category]||0)+Number(e.amount));const max=Math.max(1,...Object.values(by));q('breakdownHost').innerHTML=Object.keys(by).length?'<div class="breakdown"><h4>By category</h4>'+Object.entries(by).sort((a,b)=>b[1]-a[1]).map(([c,a])=>'<div class="bd-row"><div class="bd-label">'+esc(c)+'</div><div class="bd-track"><div class="bd-fill" style="width:'+(a/max*100).toFixed(0)+'%;background:'+(CAT_COLORS[c]||'var(--slate)')+';"></div></div><div class="bd-amt">'+money(a)+'</div></div>').join('')+'</div>':''; }
+function renderLedger(list) { const host=q('ledgerHost');if(!list.length){host.innerHTML='<div class="empty-state"><p>No '+(expenseView==='archived'?'archived ':'')+'expenses in this view yet.</p></div>';return;}const groups={};list.forEach(e=>(groups[monthKey(e.date)]??=[]).push(e));host.innerHTML='<div class="ledger">'+Object.keys(groups).sort().reverse().map(m=>'<div class="month-group"><div class="month-title">'+monthLabel(m)+'</div>'+groups[m].sort((a,b)=>b.date.localeCompare(a.date)).map(cardHtml).join('')+'</div>').join('')+'</div>';host.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>openReceipt(b.dataset.view));host.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>remove(b.dataset.del));host.querySelectorAll('[data-archive]').forEach(b=>b.onclick=()=>archive(b.dataset.archive,b.dataset.to==='true')); }
+function cardHtml(e){const color=CAT_COLORS[e.category]||'var(--slate)';return '<div class="expense-card"><div class="e-date">'+date(e.date)+'</div><div><div class="e-vendor">'+esc(e.vendor)+'</div>'+(e.note?'<div class="e-note">'+esc(e.note)+'</div>':'')+'</div><div><span class="cat-badge" style="background:'+color+';">'+esc(e.category)+'</span></div><div class="e-right"><span class="e-amt">'+money(e.amount)+'</span>'+(e.receiptPath?'<button class="view-btn" data-view="'+e.id+'">View</button>':'')+'<button class="view-btn" data-archive="'+e.id+'" data-to="'+(!e.archived)+'">'+(e.archived?'Restore':'Archive')+'</button><button class="e-del" data-del="'+e.id+'" aria-label="Delete">&times;</button></div></div>';}
+async function openReceipt(id){const e=expenses.find(x=>x.id===id);if(!e?.receiptPath)return;const {data,error}=await sb.storage.from('receipt-photos').createSignedUrl(e.receiptPath,60);if(error)return alert(error.message);q('receiptContent').innerHTML='<img src="'+data.signedUrl+'" alt="Private receipt photo"><p class="rp-title">'+esc(e.vendor)+'</p><p class="rp-date">'+date(e.date)+'</p><div class="rp-row"><span>'+esc(e.note||'Purchase')+'</span><span>'+money(e.amount)+'</span></div><button class="mini-btn primary" id="closeReceipt">Close</button>';q('receiptOverlay').classList.add('active');q('closeReceipt').onclick=()=>q('receiptOverlay').classList.remove('active');}
+function itemStats(p){const active=p.filter(x=>!x.emptyDate),closed=p.filter(x=>x.emptyDate);let qty=0,days=0;closed.forEach(x=>{const d=daysBetween(x.startDate||x.date,x.emptyDate);if(d>0){qty+=Number(x.quantity||0);days+=d;}});return{active,rate:days?qty/days:null,stock:active.reduce((s,x)=>s+Number(x.quantity||0),0)};}
+function renderPantryView(){const list=recordsFor(pantryView,true),host=q('pantryGridHost');if(!list.length){host.innerHTML='<div class="empty-state"><p>No '+(pantryView==='archived'?'archived ':'')+'pantry items in this view yet.</p></div>';return;}const groups={};list.forEach(e=>{const k=e.itemName||e.vendor;(groups[k]??=[]).push(e)});host.innerHTML='<div class="pantry-grid">'+Object.entries(groups).map(([name,p])=>pantryCard(name,p)).join('')+'</div>';Object.entries(groups).forEach(([name,p])=>{const card=q('pitem-'+slug(name));card.querySelector('.pantry-item-top').onclick=()=>{expandedPantryItem=expandedPantryItem===name?null:name;renderPantryView();};if(expandedPantryItem===name)wirePantry(card,name,p);});}
+function slug(v){return String(v).toLowerCase().replace(/[^a-z0-9]+/g,'-');}
+function pantryCard(name,p){const s=itemStats(p),x=p[0],expanded=expandedPantryItem===name;const status=s.stock<=0?'Out of stock':s.rate?'~'+Math.round(s.stock/s.rate)+' days left':s.stock+' '+esc(x.unit||'')+' on hand';return '<div class="pantry-item-card" id="pitem-'+slug(name)+'"><div class="pantry-item-top"><div><p class="pantry-item-name">'+esc(name)+'</p><span class="pantry-item-vendor">'+esc(x.vendor)+'</span></div></div><div class="pantry-status-row"><span class="pantry-status-dot" style="background:var(--olive);"></span>'+status+'</div>'+(expanded?pantryDetail(name,p,s):'')+'</div>';}
+function pantryDetail(name,p,s){return '<div class="pantry-detail" onclick="event.stopPropagation()"><h5>Purchase history</h5>'+p.sort((a,b)=>b.date.localeCompare(a.date)).map(x=>'<div class="pantry-history-row"><div class="pantry-history-top"><span>'+date(x.date)+' · '+esc(x.quantity)+' '+esc(x.unit)+' · '+money(x.amount)+'</span><span>'+(x.emptyDate?'used up '+date(x.emptyDate):x.startDate?'in use since '+date(x.startDate):'unopened')+'</span></div></div>').join('')+(s.rate?'<div class="pantry-meta-line">Average usage: '+s.rate.toFixed(2)+' '+esc(p[0].unit)+'/day</div>':'')+'<div class="pantry-detail-actions"><button class="pantry-mini-btn" data-action="empty">Mark used up</button><button class="pantry-mini-btn" data-action="buy">Log new purchase</button><button class="pantry-mini-btn" data-action="archive">'+(p[0].archived?'Restore':'Archive item')+'</button>'+(p[0].purchaseLink?'<a class="pantry-mini-btn" target="_blank" rel="noopener" href="'+esc(p[0].purchaseLink)+'">↗ Buy more</a>':'')+'</div><div class="pantry-inline-form" data-form="empty"><input type="date" value="'+todayStr()+'"><button>Confirm</button></div><div class="pantry-inline-form" data-form="buy"><input type="number" step="0.1" placeholder="qty"><input type="date" value="'+todayStr()+'"><input type="number" step="0.01" placeholder="cost"><button>Confirm</button></div></div>';}
+function wirePantry(card,name,p){card.querySelectorAll('[data-action]').forEach(b=>b.onclick=async()=>{const a=b.dataset.action;if(a==='archive')return archive(p[0].id,!p[0].archived);const f=card.querySelector('[data-form="'+a+'"]');f.classList.toggle('active');f.querySelector('button').onclick=async()=>{if(a==='empty'){const target=p.find(x=>!x.emptyDate);if(target){target.startDate||=target.date;target.emptyDate=f.querySelector('input').value||todayStr();await save(target);}}else{const i=f.querySelectorAll('input'),qty=Number(i[0].value);if(qty>0)await save({id:uid(),date:i[1].value||todayStr(),vendor:p[0].vendor,category:'Bulk Pantry Orders',amount:Number(i[2].value||0),itemName:name,quantity:qty,unit:p[0].unit,purchaseLink:p[0].purchaseLink||null,archived:p[0].archived});}renderPantryView();};});}
+function downloadCsv(records,filename){const columns=['date','vendor','category','amount','note','itemName','quantity','unit','startDate','emptyDate','archived','purchaseLink'];const csv=[columns.join(','),...records.map(r=>columns.map(k=>'"'+String(r[k]??'').replaceAll('"','""')+'"').join(','))].join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=filename;a.click();URL.revokeObjectURL(a.href);}
+q('openAdd').onclick=()=>{q('f-date').value=todayStr();q('overlay').classList.add('active');};q('cancelAdd').onclick=()=>q('overlay').classList.remove('active');q('saveAdd').onclick=async()=>{const vendor=q('f-vendor').value.trim(),amount=q('f-amount').value;if(!vendor||!amount||Number(amount)<=0){q('f-err').style.display='block';return;}const e={id:uid(),date:q('f-date').value||todayStr(),vendor,amount:Number(amount),category:q('f-category').value,note:q('f-note').value.trim(),archived:false};try{e.receiptPath=await uploadReceipt(q('f-receipt').files[0],e.id);await save(e);q('overlay').classList.remove('active');q('f-vendor').value=q('f-amount').value=q('f-note').value='';q('f-receipt').value='';render();}catch(err){alert('Could not save expense: '+err.message);}};
+q('openPantryAdd').onclick=()=>{q('p-date').value=todayStr();q('pantryOverlay').classList.add('active');};q('cancelPantryAdd').onclick=()=>q('pantryOverlay').classList.remove('active');q('savePantryAdd').onclick=async()=>{const name=q('p-name').value.trim(),qty=Number(q('p-qty').value),unit=q('p-unit').value.trim();if(!name||!qty||!unit){q('p-err').style.display='block';return;}await save({id:uid(),date:q('p-date').value||todayStr(),vendor:q('p-vendor').value,category:'Bulk Pantry Orders',amount:Number(q('p-cost').value||0),itemName:name,quantity:qty,unit,purchaseLink:q('p-link').value.trim()||null,archived:false});q('pantryOverlay').classList.remove('active');q('p-name').value=q('p-qty').value=q('p-unit').value=q('p-cost').value=q('p-link').value='';renderPantryView();};
+q('backToBudget').onclick=()=>{q('pantryView').style.display='none';q('budgetView').style.display='block';document.body.classList.remove('pantry-bg');render();};q('receiptOverlay').onclick=e=>{if(e.target===q('receiptOverlay'))q('receiptOverlay').classList.remove('active');};
+boot();
+</script>
+</body>
+</html>
